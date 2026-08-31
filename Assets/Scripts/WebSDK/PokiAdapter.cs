@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class PokiAdapter : IPlatformSDK
@@ -10,6 +10,11 @@ public class PokiAdapter : IPlatformSDK
         PokiUnitySDK.Instance.sdkInitializedCallback = () =>
         {
             Debug.Log("[PokiAdapter] SDK Initialized.");
+
+            // Poki shows its own loading bar until this is called - dismiss it now that
+            // the SDK (and therefore Unity) has finished loading.
+            PokiUnitySDK.Instance.gameLoadingFinished();
+
             onInitialized?.Invoke();
         };
 
@@ -75,4 +80,67 @@ public class PokiAdapter : IPlatformSDK
     {
         // No Poki event
     }
+
+    // ------------------------------------------------------------------------
+    // Poki-specific features below. These fall outside the generic
+    // IPlatformSDK contract, but are exposed directly since Poki is this
+    // template's only supported platform.
+    // ------------------------------------------------------------------------
+
+    /// <summary>Show Poki's loading indicator again for extra mid-game loading (e.g. a new level).</summary>
+    public void GameLoadingStart() => PokiUnitySDK.Instance.gameLoadingStart();
+
+    /// <summary>Call once the extra mid-game loading started via GameLoadingStart() has finished.</summary>
+    public void GameLoadingFinished() => PokiUnitySDK.Instance.gameLoadingFinished();
+
+    public void GetUser(Action<PokiUser> onResolved, Action onRejected)
+    {
+        PokiUnitySDK.Instance.getUserResolvedCallback = (user) => onResolved?.Invoke(user);
+        PokiUnitySDK.Instance.getUserRejectedCallback = () => onRejected?.Invoke();
+        PokiUnitySDK.Instance.getUser();
+    }
+
+    public void GetToken(Action<string> onResolved, Action onRejected)
+    {
+        PokiUnitySDK.Instance.getTokenResolvedCallback = (token) => onResolved?.Invoke(token);
+        PokiUnitySDK.Instance.getTokenRejectedCallback = () => onRejected?.Invoke();
+        PokiUnitySDK.Instance.getToken();
+    }
+
+    public void Login(Action onResolved, Action onRejected)
+    {
+        PokiUnitySDK.Instance.loginResolvedCallback = () => onResolved?.Invoke();
+        PokiUnitySDK.Instance.loginRejectedCallback = () => onRejected?.Invoke();
+        PokiUnitySDK.Instance.login();
+    }
+
+    public void ShareableURL(ScriptableObject urlParams, Action<string> onResolved, Action onRejected)
+    {
+        PokiUnitySDK.Instance.shareableURLResolvedCallback = (url) => onResolved?.Invoke(url);
+        PokiUnitySDK.Instance.shareableURLRejectedCallback = () => onRejected?.Invoke();
+        PokiUnitySDK.Instance.shareableURL(urlParams);
+    }
+
+    public void CustomEvent(string noun, string verb, ScriptableObject data = null) =>
+        PokiUnitySDK.Instance.customEvent(noun, verb, data);
+
+    public void Measure(string category, string what = "", string action = "") =>
+        PokiUnitySDK.Instance.measure(category, what, action);
+
+    public void DisplayAd(string identifier, string size, string top, string left) =>
+        PokiUnitySDK.Instance.displayAd(identifier, size, top, left);
+
+    public void DestroyAd(string identifier) => PokiUnitySDK.Instance.destroyAd(identifier);
+
+    public void MovePill(double topPercent, double topPx) => PokiUnitySDK.Instance.movePill(topPercent, topPx);
+
+    public string GetURLParam(string name) => PokiUnitySDK.Instance.getURLParam(name);
+
+    public string GetLanguage() => PokiUnitySDK.Instance.getLanguage();
+
+    public string OpenExternalLink(string link) => PokiUnitySDK.Instance.openExternalLink(link);
+
+    public void Redirect(string destination) => PokiUnitySDK.Instance.redirect(destination);
+
+    public void LogError(string error) => PokiUnitySDK.Instance.logError(error);
 }

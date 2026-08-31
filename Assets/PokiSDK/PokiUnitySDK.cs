@@ -299,6 +299,14 @@ public class PokiUnitySDK : MonoBehaviour {
 		#endif
 	}
 
+	public void redirect(string destination){
+		#if UNITY_EDITOR
+		Debug.Log("PokiUnitySDK: redirect to "+destination);
+		#else
+		JS_PokiSDK_redirect(destination);
+		#endif
+	}
+
 	public void logError(string error){
 		#if UNITY_EDITOR
 		Debug.Log("PokiUnitySDK: logError");
