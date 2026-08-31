@@ -11,10 +11,9 @@ public class PokiAdapter : IPlatformSDK
         {
             Debug.Log("[PokiAdapter] SDK Initialized.");
 
-            // Poki shows its own loading bar until this is called - dismiss it now that
-            // the SDK (and therefore Unity) has finished loading.
-            PokiUnitySDK.Instance.gameLoadingFinished();
-
+            // NOTE: Poki keeps its loading bar up until gameLoadingFinished() is
+            // called. That is now driven by Bootstrapper, once the first playable
+            // scene is actually visible - not here on mere SDK-ready.
             onInitialized?.Invoke();
         };
 
